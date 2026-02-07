@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historia Interactiva del Español</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: #fdfbf7; /* Blanco Antiguo / Crema */
+            background-image: url("https://www.transparenttextures.com/patterns/cream-paper.png"); /* Textura de papel */
+            color: #2d2d2d;
+            overflow-x: hidden;
+        }
+        h1, h2, h3, h4 {
+            font-family: 'Merriweather', serif;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e5e7eb;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #b91c1c;
+            border-radius: 5px;
+        }
+        /* Timeline Line */
+        .timeline-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            /* Degradado más cálido: Rojo a Dorado a Púrpura */
+            background: linear-gradient(to bottom, #b91c1c, #d97706, #7e22ce);
+            transform: translateX(-50%);
+            z-index: 0;
+        }
+        /* Cards */
+        .timeline-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background-color: #ffffff;
+            border: 1px solid #e5e7eb;
+        }
+        .timeline-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-color: #d1d5db;
+        }
+        /* Button Pulse */
+        @keyframes pulse-audio {
+            0% { box-shadow: 0 0 0 0 rgba(185, 28, 28, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(185, 28, 28, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(185, 28, 28, 0); }
+        }
+        .speaking {
+            animation: pulse-audio 1.5s infinite;
+            background-color: #fee2e2 !important;
+            color: #991b1b !important;
+            border-color: #991b1b !important;
+        }
+        
+        /* Mobile adjustments */
+        @media (max-width: 768px) {
+            .timeline-line { left: 30px; }
+            .timeline-content { margin-left: 60px !important; width: calc(100% - 80px) !important; text-align: left !important; }
+            .timeline-dot { left: 30px !important; }
+            .date-mobile { display: block; margin-bottom: 0.5rem; color: #b91c1c; font-weight: bold; }
+            .desktop-date { display: none; }
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-slate-800">
+
+    <!-- Navbar Sticky -->
+    <nav class="fixed top-0 w-full bg-[#fdfbf7]/95 backdrop-blur-md shadow-sm border-b border-stone-200 z-50 py-3 px-6 flex justify-between items-center">
+        <span class="font-bold text-xl text-red-800 font-serif"><i class="fas fa-quill-pen mr-2"></i>Historia del Español</span>
+        <button onclick="stopAudio()" class="bg-stone-200 hover:bg-stone-300 text-stone-700 px-4 py-2 rounded-full text-sm transition font-bold border border-stone-300">
+            <i class="fas fa-stop mr-2"></i>Detener Audio
+        </button>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative h-[60vh] flex flex-col items-center justify-center text-center bg-gradient-to-br from-red-900 via-red-950 to-slate-900 text-white px-4 mt-10 overflow-hidden border-b-8 border-yellow-600">
+        <div class="absolute inset-0 opacity-40 bg-[url('https://www.transparenttextures.com/patterns/dark-leather.png')]"></div>
+        
+        <div data-aos="zoom-in" data-aos-duration="1000" class="relative z-10">
+            <div class="inline-block mb-4 p-3 border-2 border-yellow-500/50 rounded-full bg-black/30 backdrop-blur-sm">
+                <i class="fas fa-book-atlas text-4xl text-yellow-500"></i>
+            </div>
+            <h1 class="text-4xl md:text-6xl font-black mb-4 tracking-tight drop-shadow-lg text-amber-50">
+                El Viaje del Idioma
+            </h1>
+            <div class="h-1 w-24 bg-yellow-500 mx-auto mb-6 rounded-full"></div>
+            <p class="text-xl md:text-2xl font-serif italic text-amber-100/90 max-w-2xl mx-auto">
+                "La lengua es el compañero del imperio" <br><span class="text-sm not-italic mt-2 block opacity-75">— Antonio de Nebrija (1492)</span>
+            </p>
+            <div class="mt-10 animate-bounce">
+                <i class="fas fa-chevron-down text-3xl text-yellow-500/80 hover:text-yellow-400 transition"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- Timeline Container -->
+    <main class="max-w-6xl mx-auto py-20 relative px-4 overflow-hidden">
+        <div class="timeline-line"></div>
+
+        <!-- Evento 1 -->
+        <div class="flex flex-col md:flex-row justify-between items-center w-full mb-24 relative group timeline-item">
+            <div class="hidden md:block w-5/12 text-right pr-10 desktop-date" data-aos="fade-right">
+                <h3 class="text-4xl font-bold text-red-800 font-serif">218 a.C.</h3>
+                <span class="text-stone-500 font-semibold tracking-wider text-sm uppercase">Romanización</span>
+            </div>
+            
+            <div class="absolute left-1/2 top-0 w-12 h-12 bg-red-800 border-4 border-[#fdfbf7] rounded-full -translate-x-1/2 z-10 flex items-center justify-center shadow-lg timeline-dot">
+                <i class="fas fa-monument text-amber-100 text-lg"></i>
+            </div>
+
+            <div class="w-full md:w-5/12 md:pl-10 timeline-content" data-aos="fade-left">
+                <span class="date-mobile md:hidden text-2xl font-serif">218 a.C.</span>
+                <div class="bg-white p-6 rounded-xl shadow-lg timeline-card border-l-4 border-red-800 relative">
+                    <!-- Image: Aqueduct of Segovia (Iconic Roman Spain) -->
+                    <div class="h-40 w-full bg-stone-200 rounded-lg mb-4 overflow-hidden relative border border-stone-200">
+                        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Acueducto_de_Segovia_(Segovia).jpg" alt="Acueducto de Segovia" class="w-full h-full object-cover hover:scale-110 transition duration-700 opacity-90 hover:opacity-100">
+                    </div>
+                    <h4 class="text-2xl font-bold mb-2 text-stone-800 font-serif">Llegada de Roma</h4>
+                    <p class="text-stone-600 mb-4 leading-relaxed text-speech text-sm md:text-base">
+                        El desembarco de los romanos impuso el <strong>latín vulgar</strong> sobre las lenguas ibéricas. De aquí proviene el 70% de nuestro vocabulario actual, como "madre" (mater) o "agua" (aqua).
+                    </p>
+                    <button class="btn-audio w-full py-2 rounded-lg border border-red-200 text-red-800 bg-red-50 hover:bg-red-100 transition flex items-center justify-center gap-2 font-bold font-serif" onclick="readText(this)">
+                        <i class="fas fa-volume-up"></i> Escuchar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Evento 2 -->
+        <div class="flex flex-col md:flex-row-reverse justify-between items-center w-full mb-24 relative group timeline-item">
+            <div class="hidden md:block w-5/12 text-left pl-10 desktop-date" data-aos="fade-left">
+                <h3 class="text-4xl font-bold text-stone-600 font-serif">Siglo V (409)</h3>
+                <span class="text-stone-500 font-semibold tracking-wider text-sm uppercase">Invasión Visigoda</span>
+            </div>
+            
+            <div class="absolute left-1/2 top-0 w-10 h-10 bg-stone-600 border-4 border-[#fdfbf7] rounded-full -translate-x-1/2 z-10 flex items-center justify-center shadow-lg timeline-dot">
+                <i class="fas fa-shield-alt text-white text-sm"></i>
+            </div>
+
+            <div class="w-full md:w-5/12 md:pr-10 text-right timeline-content" data-aos="fade-right">
+                <span class="date-mobile md:hidden text-2xl text-stone-600 font-serif">Siglo V d.C.</span>
+                <div class="bg-white p-6 rounded-xl shadow-lg timeline-card border-r-4 border-stone-600 text-left">
+                    <!-- Image: Medieval Stone/Architecture (Evoking Visigothic style) -->
+                    <div class="h-40 w-full bg-stone-200 rounded-lg mb-4 overflow-hidden border border-stone-200">
+                        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Santa_Mar%C3%ADa_del_Naranco_(Monte_Naranco,_Oviedo).jpg" alt="Arquitectura Medieval" class="w-full h-full object-cover object-top hover:scale-110 transition duration-700 opacity-90 hover:opacity-100">
+                    </div>
+                    <h4 class="text-2xl font-bold mb-2 text-stone-800 font-serif">El Aporte Germánico</h4>
+                    <p class="text-stone-600 mb-4 leading-relaxed text-speech text-sm md:text-base">
+                        Con la caída de Roma, los visigodos adoptaron el latín pero introdujeron términos militares como "guerra" o "yelmo", y nombres propios como Rodrigo y Fernando.
+                    </p>
+                    <button class="btn-audio w-full py-2 rounded-lg border border-stone-200 text-stone-600 bg-stone-50 hover:bg-stone-100 transition flex items-center justify-center gap-2 font-bold font-serif" onclick="readText(this)">
+                        <i class="fas fa-volume-up"></i> Escuchar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Evento 3 -->
+        <div class="flex flex-col md:flex-row justify-between items-center w-full mb-24 relative group timeline-item">
+            <div class="hidden md:block w-5/12 text-right pr-10 desktop-date" data-aos="fade-right">
+                <h3 class="text-4xl font-bold text-amber-700 font-serif">711 - 1492</h3>
+                <span class="text-stone-500 font-semibold tracking-wider text-sm uppercase">Al-Andalus</span>
+            </div>
+            
+            <div class="absolute left-1/2 top-0 w-12 h-12 bg-amber-600 border-4 border-[#fdfbf7] rounded-full -translate-x-1/2 z-10 flex items-center justify-center shadow-lg timeline-dot">
+                <i class="fas fa-mosque text-white text-lg"></i>
+            </div>
+
+            <div class="w-full md:w-5/12 md:pl-10 timeline-content" data-aos="fade-left">
+                <span class="date-mobile md:hidden text-2xl text-amber-700 font-serif">711 - 1492</span>
+                <div class="bg-white p-6 rounded-xl shadow-lg timeline-card border-l-4 border-amber-600">
+                    <!-- Image: Alhambra/Arabic Details (Cultural) -->
+                    <div class="h-40 w-full bg-stone-200 rounded-lg mb-4 overflow-hidden border border-stone-200">
+                        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Alhambra_detail.jpg" alt="Detalles de la Alhambra" class="w-full h-full object-cover hover:scale-110 transition duration-700 opacity-90 hover:opacity-100">
+                    </div>
+                    <h4 class="text-2xl font-bold mb-2 text-stone-800 font-serif">El Superestrato Árabe</h4>
+                    <p class="text-stone-600 mb-4 leading-relaxed text-speech text-sm md:text-base">
+                        Casi 8 siglos de convivencia dejaron más de 4,000 palabras en nuestro diccionario. Términos de ciencia, agricultura y hogar como "almohada", "aceite", "cifra" o "ojalá".
+                    </p>
+                    <button class="btn-audio w-full py-2 rounded-lg border border-amber-200 text-amber-700 bg-amber-50 hover:bg-amber-100 transition flex items-center justify-center gap-2 font-bold font-serif" onclick="readText(this)">
+                        <i class="fas fa-volume-up"></i> Escuchar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Evento 4: Escritos -->
+        <div class="flex flex-col md:flex-row-reverse justify-between items-center w-full mb-24 relative group timeline-item">
+            <div class="hidden md:block w-5/12 text-left pl-10 desktop-date" data-aos="fade-left">
+                <h3 class="text-4xl font-bold text-indigo-800 font-serif">Siglos IX - XI</h3>
+                <span class="text-stone-500 font-semibold tracking-wider text-sm uppercase">El Nacimiento Escrito</span>
+            </div>
+            
+            <div class="absolute left-1/2 top-0 w-10 h-10 bg-indigo-800 border-4 border-[#fdfbf7] rounded-full -translate-x-1/2 z-10 flex items-center justify-center shadow-lg timeline-dot">
+                <i class="fas fa-scroll text-white text-sm"></i>
+            </div>
+
+            <div class="w-full md:w-5/12 md:pr-10 text-right timeline-content" data-aos="fade-right">
+                <span class="date-mobile md:hidden text-2xl text-indigo-800 font-serif">Siglos IX - XI</span>
+                <div class="bg-white p-6 rounded-xl shadow-lg timeline-card border-r-4 border-indigo-800 text-left">
+                    <!-- Image: Old Manuscript -->
+                    <div class="h-40 w-full bg-stone-200 rounded-lg mb-4 overflow-hidden border border-stone-200">
+                        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Glosas.02.jpg" alt="Manuscritos Antiguos" class="w-full h-full object-cover hover:scale-110 transition duration-700 opacity-90 hover:opacity-100">
+                    </div>
+                    <h4 class="text-2xl font-bold mb-2 text-stone-800 font-serif">Primeras Palabras</h4>
+                    <p class="text-stone-600 mb-4 leading-relaxed text-speech text-sm md:text-base">
+                        Aparecen los Cartularios de Valpuesta y las Glosas Emilianenses. El idioma deja de ser solo hablado y los monjes empiezan a escribir las primeras traducciones al margen de textos latinos.
+                    </p>
+                    <button class="btn-audio w-full py-2 rounded-lg border border-indigo-200 text-indigo-800 bg-indigo-50 hover:bg-indigo-100 transition flex items-center justify-center gap-2 font-bold font-serif" onclick="readText(this)">
+                        <i class="fas fa-volume-up"></i> Escuchar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Evento 5: Alfonso X -->
+        <div class="flex flex-col md:flex-row justify-between items-center w-full mb-24 relative group timeline-item">
+            <div class="hidden md:block w-5/12 text-right pr-10 desktop-date" data-aos="fade-right">
+                <h3 class="text-4xl font-bold text-blue-800 font-serif">1252 - 1284</h3>
+                <span class="text-stone-500 font-semibold tracking-wider text-sm uppercase">El Rey Sabio</span>
+            </div>
+            
+            <div class="absolute left-1/2 top-0 w-12 h-12 bg-blue-700 border-4 border-[#fdfbf7] rounded-full -translate-x-1/2 z-10 flex items-center justify-center shadow-lg timeline-dot">
+                <i class="fas fa-crown text-white text-lg"></i>
+            </div>
+
+            <div class="w-full md:w-5/12 md:pl-10 timeline-content" data-aos="fade-left">
+                <span class="date-mobile md:hidden text-2xl text-blue-800 font-serif">1252</span>
+                <div class="bg-white p-6 rounded-xl shadow-lg timeline-card border-l-4 border-blue-700">
+                    <!-- Image: Medieval King Statue -->
+                    <div class="h-40 w-full bg-stone-200 rounded-lg mb-4 overflow-hidden border border-stone-200">
+                        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Estatua_de_Alfonso_X_el_Sabio_en_la_Biblioteca_Nacional.jpg" alt="Alfonso X" class="w-full h-full object-cover object-top hover:scale-110 transition duration-700 opacity-90 hover:opacity-100">
+                    </div>
+                    <h4 class="text-2xl font-bold mb-2 text-stone-800 font-serif">Oficialización del Idioma</h4>
+                    <p class="text-stone-600 mb-4 leading-relaxed text-speech text-sm md:text-base">
+                        Alfonso X elevó el castellano a lengua de cultura, ciencia y leyes a través de la Escuela de Traductores de Toledo, creando la primera norma ortográfica estándar.
+                    </p>
+                    <button class="btn-audio w-full py-2 rounded-lg border border-blue-200 text-blue-800 bg-blue-50 hover:bg-blue-100 transition flex items-center justify-center gap-2 font-bold font-serif" onclick="readText(this)">
+                        <i class="fas fa-volume-up"></i> Escuchar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Evento 6: 1492 -->
+        <div class="flex flex-col md:flex-row-reverse justify-between items-center w-full mb-24 relative group timeline-item">
+            <div class="hidden md:block w-5/12 text-left pl-10 desktop-date" data-aos="fade-left">
+                <h3 class="text-5xl font-black text-red-800 font-serif">1492</h3>
+                <span class="text-stone-500 font-semibold tracking-wider text-sm uppercase">Año Crucial</span>
+            </div>
+            
+            <div class="absolute left-1/2 top-0 w-14 h-14 bg-red-800 border-4 border-[#fdfbf7] rounded-full -translate-x-1/2 z-10 flex items-center justify-center shadow-lg timeline-dot">
+                <i class="fas fa-globe-americas text-white text-xl"></i>
+            </div>
+
+            <div class="w-full md:w-5/12 md:pr-10 text-right timeline-content" data-aos="fade-right">
+                <span class="date-mobile md:hidden text-2xl text-red-800 font-bold font-serif">1492</span>
+                <div class="bg-white p-6 rounded-xl shadow-2xl timeline-card border-r-4 border-red-800 text-left relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-20 h-20 bg-yellow-100 rounded-bl-full -mr-10 -mt-10 opacity-50 z-0"></div>
+                    <!-- Image: Old Map/Ship -->
+                    <div class="h-40 w-full bg-stone-200 rounded-lg mb-4 overflow-hidden border border-stone-200 relative z-10">
+                        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Gramatica_castellana_Nebrija_1492.jpg" alt="Gramática y Mapas" class="w-full h-full object-cover object-top hover:scale-110 transition duration-700 opacity-90 hover:opacity-100">
+                    </div>
+                    <h4 class="text-2xl font-bold mb-2 text-red-900 font-serif relative z-10">Expansión y Gramática</h4>
+                    <p class="text-stone-700 mb-4 leading-relaxed text-speech text-sm md:text-base relative z-10">
+                        Tres hitos cambiaron la historia: Nebrija publica la primera Gramática castellana, Colón llega a América iniciando el mestizaje lingüístico, y la expulsión de los judíos da origen al ladino.
+                    </p>
+                    <button class="btn-audio w-full py-2 rounded-lg bg-red-800 text-white hover:bg-red-900 transition flex items-center justify-center gap-2 font-bold shadow-md font-serif relative z-10" onclick="readText(this)">
+                        <i class="fas fa-volume-up"></i> Escuchar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Evento 7: Siglo de Oro -->
+        <div class="flex flex-col md:flex-row justify-between items-center w-full mb-24 relative group timeline-item">
+            <div class="hidden md:block w-5/12 text-right pr-10 desktop-date" data-aos="fade-right">
+                <h3 class="text-4xl font-bold text-stone-600 font-serif">S. XVI - XVII</h3>
+                <span class="text-stone-500 font-semibold tracking-wider text-sm uppercase">Siglo de Oro</span>
+            </div>
+            
+            <div class="absolute left-1/2 top-0 w-10 h-10 bg-stone-500 border-4 border-[#fdfbf7] rounded-full -translate-x-1/2 z-10 flex items-center justify-center shadow-lg timeline-dot">
+                <i class="fas fa-feather-alt text-white text-sm"></i>
+            </div>
+
+            <div class="w-full md:w-5/12 md:pl-10 timeline-content" data-aos="fade-left">
+                <span class="date-mobile md:hidden text-2xl text-stone-600 font-serif">Siglos XVI - XVII</span>
+                <div class="bg-white p-6 rounded-xl shadow-lg timeline-card border-l-4 border-stone-500">
+                    <!-- Image: Cervantes Statue (Representing the Author and Language) -->
+                    <div class="h-40 w-full bg-stone-200 rounded-lg mb-4 overflow-hidden border border-stone-200">
+                        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Monumento_a_Cervantes_(Madrid)_07.jpg" alt="Miguel de Cervantes" class="w-full h-full object-cover object-top hover:scale-110 transition duration-700 opacity-90 hover:opacity-100">
+                    </div>
+                    <h4 class="text-2xl font-bold mb-2 text-stone-800 font-serif">La Revolución del Sonido</h4>
+                    <p class="text-stone-600 mb-4 leading-relaxed text-speech text-sm md:text-base">
+                        Ocurre el "reajuste fonológico". Nacen los sonidos modernos de la Jota (J) y la Zeta (Z) en España, mientras que en América se consolida el seseo.
+                    </p>
+                    <button class="btn-audio w-full py-2 rounded-lg border border-stone-200 text-stone-600 bg-stone-50 hover:bg-stone-100 transition flex items-center justify-center gap-2 font-bold font-serif" onclick="readText(this)">
+                        <i class="fas fa-volume-up"></i> Escuchar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Evento 8: RAE -->
+        <div class="flex flex-col md:flex-row-reverse justify-between items-center w-full mb-24 relative group timeline-item">
+            <div class="hidden md:block w-5/12 text-left pl-10 desktop-date" data-aos="fade-left">
+                <h3 class="text-4xl font-bold text-sky-800 font-serif">1713 - 1844</h3>
+                <span class="text-stone-500 font-semibold tracking-wider text-sm uppercase">La Academia</span>
+            </div>
+            
+            <div class="absolute left-1/2 top-0 w-10 h-10 bg-sky-800 border-4 border-[#fdfbf7] rounded-full -translate-x-1/2 z-10 flex items-center justify-center shadow-lg timeline-dot">
+                <i class="fas fa-university text-white text-sm"></i>
+            </div>
+
+            <div class="w-full md:w-5/12 md:pr-10 text-right timeline-content" data-aos="fade-right">
+                <span class="date-mobile md:hidden text-2xl text-sky-800 font-serif">1713</span>
+                <div class="bg-white p-6 rounded-xl shadow-lg timeline-card border-r-4 border-sky-800 text-left">
+                    <!-- Image: Classic Library/Building -->
+                    <div class="h-40 w-full bg-stone-200 rounded-lg mb-4 overflow-hidden border border-stone-200">
+                        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Sede_de_la_Real_Academia_Espa%C3%B1ola.jpg" alt="Real Academia Española" class="w-full h-full object-cover hover:scale-110 transition duration-700 opacity-90 hover:opacity-100">
+                    </div>
+                    <h4 class="text-2xl font-bold mb-2 text-stone-800 font-serif">Limpia, Fija y da Esplendor</h4>
+                    <p class="text-stone-600 mb-4 leading-relaxed text-speech text-sm md:text-base">
+                        Se funda la RAE. En 1844, la Reina Isabel II impone la ortografía académica como obligatoria, acabando con el caos en la escritura oficial.
+                    </p>
+                    <button class="btn-audio w-full py-2 rounded-lg border border-sky-200 text-sky-700 bg-sky-50 hover:bg-sky-100 transition flex items-center justify-center gap-2 font-bold font-serif" onclick="readText(this)">
+                        <i class="fas fa-volume-up"></i> Escuchar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+         <!-- Evento 9: ASALE -->
+         <div class="flex flex-col md:flex-row justify-between items-center w-full mb-24 relative group timeline-item">
+            <div class="hidden md:block w-5/12 text-right pr-10 desktop-date" data-aos="fade-right">
+                <h3 class="text-4xl font-bold text-green-800 font-serif">1951</h3>
+                <span class="text-stone-500 font-semibold tracking-wider text-sm uppercase">Panhispanismo</span>
+            </div>
+            
+            <div class="absolute left-1/2 top-0 w-12 h-12 bg-green-700 border-4 border-[#fdfbf7] rounded-full -translate-x-1/2 z-10 flex items-center justify-center shadow-lg timeline-dot">
+                <i class="fas fa-users text-white text-lg"></i>
+            </div>
+
+            <div class="w-full md:w-5/12 md:pl-10 timeline-content" data-aos="fade-left">
+                <span class="date-mobile md:hidden text-2xl text-green-800 font-serif">1951</span>
+                <div class="bg-white p-6 rounded-xl shadow-lg timeline-card border-l-4 border-green-700">
+                    <!-- Image: World Map -->
+                    <div class="h-40 w-full bg-stone-200 rounded-lg mb-4 overflow-hidden border border-stone-200">
+                        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Spanish_language_World_Map.svg" alt="Mapa del Español" class="w-full h-full object-cover hover:scale-110 transition duration-700 opacity-90 hover:opacity-100">
+                    </div>
+                    <h4 class="text-2xl font-bold mb-2 text-stone-800 font-serif">Unidad en la Diversidad</h4>
+                    <p class="text-stone-600 mb-4 leading-relaxed text-speech text-sm md:text-base">
+                        Se crea la ASALE en México. España deja de decidir sola; las normas ahora se consensúan entre las 23 academias de lengua española de todo el mundo.
+                    </p>
+                    <button class="btn-audio w-full py-2 rounded-lg border border-green-200 text-green-700 bg-green-50 hover:bg-green-100 transition flex items-center justify-center gap-2 font-bold font-serif" onclick="readText(this)">
+                        <i class="fas fa-volume-up"></i> Escuchar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Evento 10: Futuro -->
+        <div class="flex flex-col md:flex-row-reverse justify-between items-center w-full mb-24 relative group timeline-item">
+            <div class="hidden md:block w-5/12 text-left pl-10 desktop-date" data-aos="fade-left">
+                <h3 class="text-4xl font-bold text-purple-800 font-serif">Hoy</h3>
+                <span class="text-stone-500 font-semibold tracking-wider text-sm uppercase">Era Digital</span>
+            </div>
+            
+            <div class="absolute left-1/2 top-0 w-12 h-12 bg-purple-800 border-4 border-[#fdfbf7] rounded-full -translate-x-1/2 z-10 flex items-center justify-center shadow-lg timeline-dot">
+                <i class="fas fa-robot text-white text-lg"></i>
+            </div>
+
+            <div class="w-full md:w-5/12 md:pr-10 text-right timeline-content" data-aos="fade-right">
+                <span class="date-mobile md:hidden text-2xl text-purple-800 font-serif">Actualidad</span>
+                <div class="bg-white p-6 rounded-xl shadow-lg timeline-card border-r-4 border-purple-800 text-left">
+                    <!-- Image: Abstract Digital AI -->
+                    <div class="h-40 w-full bg-stone-200 rounded-lg mb-4 overflow-hidden border border-stone-200">
+                        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Internet_map_1024.jpg" alt="Inteligencia Artificial" class="w-full h-full object-cover hover:scale-110 transition duration-700 opacity-90 hover:opacity-100">
+                    </div>
+                    <h4 class="text-2xl font-bold mb-2 text-stone-800 font-serif">El Español y la IA</h4>
+                    <p class="text-stone-600 mb-4 leading-relaxed text-speech text-sm md:text-base">
+                        La tecnología y la Inteligencia Artificial actúan hoy como estandarizadores del idioma. Se eliminan tildes diacríticas (solo, guion) y surgen debates sobre el lenguaje inclusivo.
+                    </p>
+                    <button class="btn-audio w-full py-2 rounded-lg border border-purple-200 text-purple-700 bg-purple-50 hover:bg-purple-100 transition flex items-center justify-center gap-2 font-bold font-serif" onclick="readText(this)">
+                        <i class="fas fa-volume-up"></i> Escuchar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer Institucional -->
+    <footer class="bg-stone-900 text-stone-400 py-12 text-center relative z-10 border-t-8 border-red-900">
+        <div class="max-w-4xl mx-auto px-4">
+            <div class="mb-4">
+                <i class="fas fa-graduation-cap text-4xl text-red-900 bg-stone-800 p-3 rounded-full border border-stone-700"></i>
+            </div>
+            <h3 class="font-serif text-2xl md:text-3xl text-stone-200 mb-2 font-bold">Laboratorio de Gramática y Ortografía</h3>
+            <div class="w-24 h-1 bg-red-900 mx-auto mb-4 rounded-full"></div>
+            <p class="text-sm font-bold tracking-[0.2em] text-stone-500 uppercase mb-8">Universidad Modular Abierta</p>
+            
+            <div class="border-t border-stone-800 pt-8 flex flex-col items-center">
+                <p class="text-stone-400 font-serif mb-2">Creado por:</p>
+                <p class="text-lg text-stone-200 font-bold font-serif border-b border-stone-700 pb-1 mb-2">Kevin Humberto Hernández Sánchez</p>
+                <p class="text-xs text-stone-600 mt-2 font-mono">© 2026</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // Init Animation on Scroll
+        AOS.init({
+            duration: 800,
+            once: true,
+            offset: 100
+        });
+
+        // Speech Synthesis Setup
+        let currentUtterance = null;
+
+        function stopAudio() {
+            window.speechSynthesis.cancel();
+            // Remove 'speaking' class from all buttons
+            document.querySelectorAll('.btn-audio').forEach(btn => {
+                btn.classList.remove('speaking');
+                btn.innerHTML = '<i class="fas fa-volume-up"></i> Escuchar';
+            });
+        }
+
+        function readText(button) {
+            // 1. Get text content
+            const container = button.closest('.timeline-card');
+            const title = container.querySelector('h4').innerText;
+            const text = container.querySelector('.text-speech').innerText;
+            const fullText = title + ". " + text;
+
+            // 2. Stop previous
+            stopAudio();
+
+            // 3. Visual feedback
+            button.classList.add('speaking');
+            button.innerHTML = '<i class="fas fa-waveform"></i> Reproduciendo...';
+
+            // 4. Setup Speech
+            const utterance = new SpeechSynthesisUtterance(fullText);
+            utterance.lang = 'es-ES'; // Prefer Spain Spanish for history context
+            utterance.rate = 1.0;
+            utterance.pitch = 1.0;
+
+            // Try to select a good voice
+            const voices = window.speechSynthesis.getVoices();
+            // Prefer Google Español or Microsoft Helena/Laura
+            const bestVoice = voices.find(v => v.lang.includes('es-ES') || v.lang.includes('es-MX'));
+            if (bestVoice) utterance.voice = bestVoice;
+
+            // 5. Events
+            utterance.onend = function() {
+                button.classList.remove('speaking');
+                button.innerHTML = '<i class="fas fa-volume-up"></i> Escuchar';
+            };
+
+            // 6. Speak
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Preload voices (chrome bug fix)
+        window.speechSynthesis.getVoices();
+    </script>
+</body>
+</html>
